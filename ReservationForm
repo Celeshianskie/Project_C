@@ -1,0 +1,108 @@
+Imports System.Data.OleDb
+
+Public Class ReservationForm
+    Dim TourPrice, Pax, Total As Double
+
+    Private Sub LbTour_SelectedIndexChanged(sender As Object, e As EventArgs) Handles LbTour.SelectedIndexChanged
+        Dim selectedTour As String = LbTour.SelectedItem.ToString()
+        Dim atLeastOneRadioButtonChecked As Boolean = False
+
+        If RbSeven.Checked Then
+            atLeastOneRadioButtonChecked = True
+            Select Case selectedTour
+                Case "Caribbean"
+                    TourPrice = 3500
+                Case "Mediterranean"
+                    TourPrice = 4250
+                Case "Alaska"
+                    TourPrice = 3300
+                Case "Europe"
+                    TourPrice = 5000
+            End Select
+        ElseIf RbFour.Checked Then
+            atLeastOneRadioButtonChecked = True
+            Select Case selectedTour
+                Case "Caribbean"
+                    TourPrice = 6000
+                Case "Mediterranean"
+                    TourPrice = 7999
+                Case "Alaska"
+                    TourPrice = 7200
+                Case "Europe"
+                    TourPrice = 9000
+            End Select
+        End If
+
+        If atLeastOneRadioButtonChecked Then
+            LblPaxCost.Text = TourPrice.ToString()
+        Else
+            LblPaxCost.Text = "Please select a tour and a duration."
+        End If
+    End Sub
+
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+        Integer.TryParse(TBPax.Text, Pax)
+        Total = Pax * TourPrice
+        LblTotal.Text = Total.ToString()
+        LblPaxCost.Show()
+        LblTotal.Show()
+    End Sub
+
+    Private Sub ReservationForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Dim minimumDate As DateTime = DateTime.Today.AddDays(3)
+        DTPDate.MinDate = minimumDate
+    End Sub
+
+
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+        Dim connectionString As String = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\COMP37\Downloads\ProjectC.mdb;"
+        Using connection As New OleDbConnection(connectionString)
+            connection.Open()
+
+
+            Dim minimumDate As DateTime = DateTime.Today.AddDays(3)
+            Dim selectedDate As DateTime = DTPDate.Value
+
+            DTPDate.MinDate = minimumDate
+
+            If LbTour.SelectedIndex = -1 Or (RbFour.Checked = False And RbSeven.Checked = False) Or TBPax.Text = "" Or selectedDate < minimumDate Or CBMode.SelectedIndex = -1 Or TbName.Text = "" Or TbAdd.Text = "" Then
+                MessageBox.Show("Please fill in all required fields.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error)
+            Else
+            End If
+
+            ' Define your database connection string
+
+            ' Get the selected items and values from your form
+            Dim textBoxValue As String = TBPax.Text
+            Dim selectedComboBoxItem As String = CBMode.SelectedItem.ToString()
+            Dim Name As String = TbName.Text
+            Dim Address As String = TbAdd.Text
+            Dim Total As String = LblTotal.Text
+
+            ' Convert the DateTime value to a format suitable for your database
+            Dim reservationDate As DateTime = DTPDate.Value
+            Dim formattedReservationDate As String = reservationDate.ToString("yyyy-MM-dd")
+
+
+            Dim query As String = "INSERT INTO CustomerData (Name, Address, textBoxValue, reservationDate, selectedComboBoxItem, Total) VALUES (?, ?, ?, ?, ?, ?)"
+            Using command As New OleDbCommand(query, connection)
+
+                ' Use parameters to avoid SQL injection and improve security
+                command.Parameters.AddWithValue("CustomerName", Name)
+                command.Parameters.AddWithValue("CustomerAddress", Address)
+                command.Parameters.AddWithValue("NumPax", textBoxValue)
+                command.Parameters.AddWithValue("DepDate", reservationDate)
+                command.Parameters.AddWithValue("ModPay", selectedComboBoxItem)
+                command.Parameters.AddWithValue("TotalCost", Total)
+
+
+                ' Execute the SQL command
+                command.ExecuteNonQuery()
+
+
+            End Using
+        End Using
+
+
+    End Sub
+End Class
