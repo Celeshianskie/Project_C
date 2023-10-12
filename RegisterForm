@@ -1,0 +1,37 @@
+Imports System.Data.OleDb
+Public Class RegisterForm
+
+    Private Sub Register_Click(sender As Object, e As EventArgs) Handles Register.Click
+        Dim connectionString As String = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\COMP37\Downloads\ProjectC.mdb;"
+
+        Dim username As String = txtCustUsername.Text
+        Dim password As String = txtCustPassword.Text
+        Dim completeName As String = txtCompName.Text
+
+
+        Try
+            Using connection As New OleDbConnection(connectionString)
+                connection.Open()
+
+                Dim com As String = "INSERT INTO CustomerAccount (Username, Password, CompleteName, CustomerID) VALUES ('" & username & "', '" & password & "', '" & completeName & "')"
+                Using command As New OleDbCommand(com, connection)
+
+                    command.Parameters.AddWithValue("@Username", username)
+                    command.Parameters.AddWithValue("@Password", password)
+                    command.Parameters.AddWithValue("@CompleteName", completeName)
+
+                    command.ExecuteNonQuery()
+
+                    MessageBox.Show("Data inserted successfully.")
+                End Using
+            End Using
+
+        Catch ex As Exception
+            MessageBox.Show("Error: " & ex.Message)
+        End Try
+    End Sub
+
+    Private Sub RegisterForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
+    End Sub
+End Class
