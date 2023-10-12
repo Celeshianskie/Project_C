@@ -8,18 +8,19 @@ Public Class RegisterForm
         Dim password As String = txtCustPassword.Text
         Dim completeName As String = txtCompName.Text
 
-
         Try
             Using connection As New OleDbConnection(connectionString)
                 connection.Open()
 
-                Dim com As String = "INSERT INTO CustomerAccount (Username, Password, CompleteName, CustomerID) VALUES ('" & username & "', '" & password & "', '" & completeName & "')"
-                Using command As New OleDbCommand(com, connection)
+                Dim query As String = "INSERT INTO CustomerAccount (Username, [Password], CompleteName) VALUES (?, ?, ?)"
+                Using command As New OleDbCommand(query, connection)
 
-                    command.Parameters.AddWithValue("@Username", username)
-                    command.Parameters.AddWithValue("@Password", password)
-                    command.Parameters.AddWithValue("@CompleteName", completeName)
+                    ' Use parameters to avoid SQL injection and improve security
+                    command.Parameters.AddWithValue("Username", username)
+                    command.Parameters.AddWithValue("Password", password)
+                    command.Parameters.AddWithValue("CompleteName", completeName)
 
+                    ' Execute the SQL command
                     command.ExecuteNonQuery()
 
                     MessageBox.Show("Data inserted successfully.")
@@ -33,5 +34,5 @@ Public Class RegisterForm
 
     Private Sub RegisterForm_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
-    End Sub
-End Class
+        End Sub
+    End Class
