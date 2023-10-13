@@ -1,0 +1,43 @@
+﻿Imports System.Data.OleDb
+
+Public Class SummaryForm
+    Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
+
+        Dim connectionString As String = "Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\Users\Admin\Downloads\ProjectC.mdb;"
+
+        Dim name As String = lblname.Text
+        Dim address As String = lbladd.Text
+        Dim Phonenum As String = lblPhone.Text
+        Dim pax As String = lblPax.Text
+        Dim Pay As String = lblPay.Text
+        Dim Cost As String = lblCost.Text
+        Try
+            Using connection As New OleDbConnection(connectionString)
+                connection.Open()
+
+                Dim query As String = "INSERT INTO CustomerData (Name, Address, PhoneNum, NumPax, DepDate, ModPayment, TotalCost) VALUES (?, ?, ?, ?, ?, ?, ?)"
+                Using command As New OleDbCommand(query, connection)
+
+
+
+                    command.Parameters.AddWithValue("Name", name)
+                    command.Parameters.AddWithValue("Address", address)
+                    command.Parameters.AddWithValue("PhoneNum", Phonenum)
+                    command.Parameters.AddWithValue("NumPax", pax)
+                    command.Parameters.Add("DepDate", OleDbType.Date).Value = SumDate.Value
+                    command.Parameters.AddWithValue("ModPayment", Pay)
+                    command.Parameters.AddWithValue("TotalCost", Cost)
+
+                    command.ExecuteNonQuery()
+
+                    MessageBox.Show("Data inserted successfully.")
+                End Using
+            End Using
+
+        Catch ex As Exception
+            MessageBox.Show("Error: " & ex.Message)
+        End Try
+
+
+    End Sub
+End Class
